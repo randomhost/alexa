@@ -1,10 +1,24 @@
 # Amazon Alexa PHP Library
 
-This library provides provides a convient interface for developing Amazon Alexa Skills for your PHP app.
+This is an extension of the amazon-alexa-php library by minicodemonkey/jakubsuchy (https://github.com/MiniCodeMonkey | https://github.com/jakubsuchy)
 
 ## Usage
 
-Install via composer: `composer require minicodemonkey/amazon-alexa-php`.
+
+
+Install via composer: 
+
+{
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/Izion/amazon-alexa-php"
+        }
+    ],
+    "require": {
+        "jakubsuchy/amazon-alexa-php": "dev-master"
+    }
+}
 
 ### Requests
 When Amazon Alexa triggers your skill, a HTTP request will be sent to the URL you specified for your app.
@@ -12,7 +26,7 @@ When Amazon Alexa triggers your skill, a HTTP request will be sent to the URL yo
 You can get the `JSON` body of the request like so:
 ```php
 $applicationId = "your-application-id-from-alexa"; // See developer.amazon.com and your Application. Will start with "amzn1.echo-sdk-ams.app."
-$rawRequest = $request->getContent; // This is how you would retrieve this with Laravel or Symfony 2.
+$rawRequest = file_get_contents('php://input');
 $alexa = new \Alexa\Request\Request($rawRequest, $applicationId);
 $alexaRequest = $alexa->fromData();
 ```
@@ -21,7 +35,7 @@ The library expect raw request data, not parsed JSON as it needs to validate the
 
 You can determine the type of the request with `instanceof`, e.g.:
 ```php
-if ($alexaRequest instanceof IntentRequest) {
+if ($alexaRequest instanceof Request\IntentRequest) {
 	// Handle intent here
 }
 ```
@@ -83,12 +97,14 @@ $response->respond('What is your favorite color?')
 	->reprompt('Please tell me your favorite color');
 ```
 
-To output the response, simply use the `->render()` function, e.g. in Laravel you would create the response like so:
 ```php
-return response()->json($response->render());
+$response = new \Alexa\Response\Response;
+$response->respond('Starting account linking')
+	->withLinkAccount();
 ```
 
-In vanilla PHP:
+To output the response, simply use the `->render()` function
+
 ```php
 header('Content-Type: application/json');
 echo json_encode($response->render());
