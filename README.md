@@ -7,7 +7,7 @@ This is an extension of the amazon-alexa-php library by minicodemonkey/jakubsuch
 
 
 Install via composer: 
-
+```php
 {
     "repositories": [
         {
@@ -19,6 +19,7 @@ Install via composer:
         "jakubsuchy/amazon-alexa-php": "dev-master"
     }
 }
+```
 
 ### Requests
 When Amazon Alexa triggers your skill, a HTTP request will be sent to the URL you specified for your app.
