@@ -8,6 +8,7 @@ class Response {
 
 	public $outputSpeech = null;
 	public $card = null;
+    public $linkaccount = null;
 	public $reprompt = null;
 	public $shouldEndSession = false;
 
@@ -79,6 +80,16 @@ class Response {
 		return $this;
 	}
 
+    /**
+     * Add link account information
+     * @return \Alexa\Response\Response
+     */
+    public function withLinkAccount() {
+        $this->linkaccount = new LinkAccount;
+
+        return $this;
+    }
+
         /**
          * Set if it should end the session
          * @param type $shouldEndSession
@@ -110,6 +121,7 @@ class Response {
 			'response' => array(
 				'outputSpeech' => $this->outputSpeech ? $this->outputSpeech->render() : null,
 				'card' => $this->card ? $this->card->render() : null,
+                'card' => $this->linkaccount ? $this->linkaccount->render() : null,
 				'reprompt' => $this->reprompt ? $this->reprompt->render() : null,
 				'shouldEndSession' => $this->shouldEndSession ? true : false
 			)

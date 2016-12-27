@@ -17,7 +17,7 @@ class Request {
 	public $session;
 	public $data;
 	public $rawData;
-	public $applicationid;
+	public $applicationId;
 
 	/**
 	 * Set up Request with RequestId, timestamp (DateTime) and user (User obj.)
@@ -93,7 +93,7 @@ class Request {
 
 		$className = '\\Alexa\\Request\\' . $requestType;
 
-		$request = new $className($this->rawData);
+		$request = new $className($this->rawData,$this->applicationId);
 		return $request;
 	}
 
