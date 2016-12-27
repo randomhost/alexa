@@ -12,7 +12,7 @@ Install via composer:
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/Izion/amazon-alexa-php"
+            "url": "https://github.com/danstreeter/amazon-alexa-php"
         }
     ],
     "require": {
@@ -27,7 +27,7 @@ When Amazon Alexa triggers your skill, a HTTP request will be sent to the URL yo
 You can get the `JSON` body of the request like so:
 ```php
 $applicationId = "your-application-id-from-alexa"; // See developer.amazon.com and your Application. Will start with "amzn1.echo-sdk-ams.app."
-$rawRequest = file_get_contents('php://input');
+$rawRequest = $request->getContent();
 $alexa = new \Alexa\Request\Request($rawRequest, $applicationId);
 $alexaRequest = $alexa->fromData();
 ```
@@ -36,7 +36,14 @@ The library expect raw request data, not parsed JSON as it needs to validate the
 
 You can determine the type of the request with `instanceof`, e.g.:
 ```php
-if ($alexaRequest instanceof Request\IntentRequest) {
+use Alexa\Request\IntentRequest;
+...
+if ($alexaRequest instanceof IntentRequest) {
+	// Handle intent here
+}
+
+// or
+if ($alexaRequest instanceof \Alexa\Request\IntentRequest) {
 	// Handle intent here
 }
 ```
