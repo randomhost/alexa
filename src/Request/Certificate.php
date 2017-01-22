@@ -81,8 +81,8 @@ class Certificate {
 		$this->certificateContent = $this->getCertificate();
 		$parsedCertificate = $this->parseCertificate($this->certificateContent);
 
-		if (!$this->validateCertificateDate($parsedCertificate) || !$this->validateCertificateSAN($parsedCertificate, static::ECHO_SERVICE_DOMAIN)) {
-			throw new InvalidArgumentException("The remote certificate doesn't contain a valid SANs in the signature or is expired.");
+		if ($parsedCertificate  == null || !$this->validateCertificateDate($parsedCertificate) || !$this->validateCertificateSAN($parsedCertificate, static::ECHO_SERVICE_DOMAIN)) {
+			throw new InvalidArgumentException("The remote certificate doesn't contain a valid SANs in the signature or is expired or was not found.");
 		}
 	}
 	/*
