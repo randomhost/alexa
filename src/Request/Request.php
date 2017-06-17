@@ -1,100 +1,258 @@
 <?php
 
-namespace Alexa\Request;
+namespace randomhost\Alexa\Request;
 
-use RuntimeException;
-use InvalidArgumentException;
 use DateTime;
+use InvalidArgumentException;
+use RuntimeException;
 
-use Alexa\Request\Certificate;
-use Alexa\Request\Application;
+/**
+ * Represents a request sent by the Alexa platform.
+ */
+class Request
+{
+    /**
+     * Request ID.
+     *
+     * @var string
+     */
+    public $requestId;
 
-class Request {
+    /**
+     * Timestamp.
+     *
+     * @var string
+     */
+    public $timestamp;
 
-	public $requestId;
-	public $timestamp;
-	/** @var Session */
-	public $session;
-	public $data;
-	public $rawData;
-	public $applicationId;
+    /**
+     * Session instance.
+     *
+     * @var Session
+     */
+    public $session;
 
-	/**
-	 * Set up Request with RequestId, timestamp (DateTime) and user (User obj.)
-	 * @param type $data
-	 */
-	public function __construct($rawData, $applicationId = NULL) {
-		if (!is_string($rawData)) {
-			throw new InvalidArgumentException('Alexa Request requires the raw JSON data to validate request signature');
-		}
+    /**
+     * Decoded JSON data.
+     *
+     * @var mixed[]
+     */
+    public $data;
 
-		// Decode the raw data into a JSON array.
-		$data = json_decode($rawData, TRUE);
-		$this->data = $data;
-		$this->rawData = $rawData;
+    /**
+     * Raw JSON data.
+     *
+     * @var string
+     */
+    public $rawData;
 
-		$this->requestId = $data['request']['requestId'];
-		$this->timestamp = new DateTime($data['request']['timestamp']);
-		$this->session = new Session($data['session']);
+    /**
+     * Application ID.
+     *
+     * @var string
+     */
+    public $applicationId;
 
-		$this->applicationId = (is_null($applicationId) && isset($data['session']['application']['applicationId']))
-			? $data['session']['application']['applicationId']
-			: $applicationId;
+    /**
+     * Certificate instance.
+     *
+     * @var Certificate
+     */
+    private $certificate;
 
-	}
+    /**
+     * Application instance.
+     *
+     * @var Application
+     */
+    private $application;
 
-	/**
-	 * Accept the certificate validator dependency in order to allow people
-	 * to extend it to for example cache their certificates.
-	 * @param \Alexa\Request\Certificate $certificate
-	 */
-	public function setCertificateDependency(\Alexa\Request\Certificate $certificate) {
-		$this->certificate = $certificate;
-	}
+    /**
+     * Constructor.
+     *
+     * @param string      $rawData       Raw JSON data.
+     * @param null|string $applicationId Application ID.
+     */
+    public function __construct($rawData, $applicationId = null)
+    {
+        if (!is_string($rawData)) {
+            throw new InvalidArgumentException(
+                'Alexa request requires the raw JSON data to validate request signature'
+            );
+        }
 
-	/**
-	 * Accept the application validator dependency in order to allow people
-	 * to extend it.
-	 * @param \Alexa\Request\Application $application
-	 */
-	public function setApplicationDependency(\Alexa\Request\Application $application) {
-		$this->application = $application;
-	}
+        $this->rawData = $rawData;
 
-	/**
-	 * Instance the correct type of Request, based on the $jons->request->type
-	 * value.
-	 * @param type $data
-	 * @return \Alexa\Request\Request   base class
-	 * @throws RuntimeException
-	 */
-	public function fromData() {
-		$data = $this->data;
+        $this->parseRawData();
 
-		// Instantiate a new Certificate validator if none is injected
-		// as our dependency.
-		if (!isset($this->certificate)) {
-			$this->certificate = new Certificate($_SERVER['HTTP_SIGNATURECERTCHAINURL'], $_SERVER['HTTP_SIGNATURE']);
-		}
-		if (!isset($this->application)) {
-			$this->application = new Application($this->applicationId);
-		}
+        $this->fetchRequestId();
+        $this->fetchTimestamp();
+        $this->fetchSession();
+        $this->fetchApplicationId($applicationId);
+    }
 
-		// We need to ensure that the request Application ID matches our Application ID.
-		$this->application->validateApplicationId($data['session']['application']['applicationId']);
-		// Validate that the request signature matches the certificate.
-		$this->certificate->validateRequest($this->rawData);
+    /**
+     * Accept the certificate validator dependency in order to allow people
+     * to extend it to for example cache their certificates.
+     *
+     * @param Certificate $certificate
+     */
+    public function setCertificateDependency(Certificate $certificate)
+    {
+        $this->certificate = $certificate;
+    }
 
+    /**
+     * Accept the application validator dependency in order to allow people
+     * to extend it.
+     *
+     * @param Application $application
+     */
+    public function setApplicationDependency(Application $application)
+    {
+        $this->application = $application;
+    }
 
-		$requestType = $data['request']['type'];
-		if (!class_exists('\\Alexa\\Request\\' . $requestType)) {
-			throw new RuntimeException('Unknown request type: ' . $requestType);
-		}
+    /**
+     * Instantiates the correct type of Request class, based on the $json->request->type value.
+     *
+     * @return Request Appropriate Request class for the request type.
+     *
+     * @throws RuntimeException
+     */
+    public function fromData()
+    {
+        // Instantiate a new Certificate validator if none is injected as our dependency.
+        if (!isset($this->certificate)) {
+            $this->certificate = new Certificate(
+                $_SERVER['HTTP_SIGNATURECERTCHAINURL'],
+                $_SERVER['HTTP_SIGNATURE']
+            );
+        }
+        if (!isset($this->application)) {
+            $this->application = new Application($this->applicationId);
+        }
 
-		$className = '\\Alexa\\Request\\' . $requestType;
+        // We need to ensure that the request Application ID matches our Application ID.
+        $this->application->setRequestApplicationId(
+            $this->data['session']['application']['applicationId']
+        );
+        $this->application->validateApplicationId();
 
-		$request = new $className($this->rawData,$this->applicationId);
-		return $request;
-	}
+        // Validate that the request signature matches the certificate.
+        $this->certificate->validateRequest($this->rawData);
+
+        $requestType = $this->data['request']['type'];
+        if (!class_exists(__NAMESPACE__.'\\'.$requestType)) {
+            throw new RuntimeException('Unknown request type: '.$requestType);
+        }
+
+        $className = __NAMESPACE__.'\\'.$requestType;
+
+        $request = new $className($this->rawData, $this->applicationId);
+
+        return $request;
+    }
+
+    /**
+     * Parses raw json data.
+     *
+     * @return $this
+     */
+    protected function parseRawData()
+    {
+        $data = json_decode($this->rawData, true);
+        if (is_null($data)) {
+            throw new RuntimeException(
+                'Could not decode JSON data'
+            );
+        }
+
+        $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * Fetches the request ID provided with the request.
+     *
+     * @return $this
+     *
+     * @throws RuntimeException
+     */
+    protected function fetchRequestId()
+    {
+        if (!isset($this->data['request']['requestId'])) {
+            throw new RuntimeException(
+                'Request does not contain required field "requestId"'
+            );
+        }
+
+        $this->requestId = $this->data['request']['requestId'];
+
+        return $this;
+    }
+
+    /**
+     * Fetches the timestamp provided with the request.
+     *
+     * @return $this
+     *
+     * @throws RuntimeException
+     */
+    protected function fetchTimestamp()
+    {
+        if (!isset($this->data['request']['timestamp'])) {
+            throw new RuntimeException(
+                'Request does not contain required field "timestamp"'
+            );
+        }
+
+        $this->timestamp = new DateTime($this->data['request']['timestamp']);
+
+        return $this;
+    }
+
+    /**
+     * Fetches the session provided with the request.
+     *
+     * @return $this
+     *
+     * @throws RuntimeException
+     */
+    protected function fetchSession()
+    {
+        if (!isset($this->data['session'])) {
+            throw new RuntimeException(
+                'Request does not contain required field "session"'
+            );
+        }
+
+        $this->session = new Session($this->data['session']);
+
+        return $this;
+    }
+
+    /**
+     * Fetches the application ID provided with the request.
+     *
+     * @param null|string $applicationId Fallback application ID.
+     *
+     * @return $this
+     *
+     * @throws RuntimeException
+     */
+    protected function fetchApplicationId($applicationId)
+    {
+        if (is_null($applicationId)
+            && isset($this->data['session']['application']['applicationId'])
+        ) {
+            $this->applicationId = $this->data['session']['application']['applicationId'];
+        } else {
+            $this->applicationId = $applicationId;
+        }
+
+        return $this;
+    }
 
 }

@@ -1,13 +1,44 @@
 <?php
 
-namespace Alexa\Request;
+namespace randomhost\Alexa\Request;
 
-class SessionEndedRequest extends Request {
-	public $reason;
+/**
+ * Represents a SessionEnded request
+ *
+ * @package Alexa\Request
+ */
+class SessionEndedRequest extends Request
+{
+    /**
+     * Reason why the session was ended.
+     *
+     * @var string
+     */
+    public $reason;
 
-	public function __construct($rawData) {
-		parent::__construct($rawData);
+    /**
+     * Constructor.
+     *
+     * @param string $rawData Raw request data.
+     */
+    public function __construct($rawData)
+    {
+        parent::__construct($rawData);
 
-		$this->reason = $this->data['request']['reason'];
-	}
+        $this->fetchReason();
+    }
+
+    /**
+     * Fetches the reason provided with the session ended request.
+     *
+     * @return $this
+     */
+    protected function fetchReason()
+    {
+        if (isset($this->data['request']['reason'])) {
+            $this->reason = $this->data['request']['reason'];
+        }
+
+        return $this;
+    }
 }

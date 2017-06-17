@@ -1,8 +1,10 @@
 <?php
 
-namespace Alexa\Response;
+namespace randomhost\Alexa\Response;
 
-
+/**
+ * Represents a LinkAccount response.
+ */
 class LinkAccount
 {
     public $type = 'LinkAccount';

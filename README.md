@@ -1,6 +1,12 @@
 # Amazon Alexa PHP Library
 
-This is an extension of the amazon-alexa-php library by minicodemonkey/jakubsuchy (https://github.com/MiniCodeMonkey | https://github.com/jakubsuchy)
+This is yet another fork of the `amazon-alexa-php` library by [minicodemonkey][1] / [jakubsuchy][2].
+
+**Status:** This fork is in the process of being rewritten and is considered **bleeding edge**
+software. The long term goal is to have a well documented package for working with [Amazon's Alexa][3],
+making use of common standards such as the `PSR-2` coding style.
+
+**Note: The documentation below has not been updated yet.**
 
 ## Usage
 
@@ -12,11 +18,11 @@ Install via composer:
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/danstreeter/amazon-alexa-php"
+            "url": "https://github.com/randomhost/alexa"
         }
     ],
     "require": {
-        "jakubsuchy/amazon-alexa-php": "dev-master"
+        "randomhost/alexa": "dev-master"
     }
 }
 ```
@@ -118,3 +124,7 @@ header('Content-Type: application/json');
 echo json_encode($response->render());
 exit;
 ```
+
+[1]: https://github.com/MiniCodeMonkey
+[2]: https://github.com/jakubsuchy
+[3]: https://www.amazon.com/alexa

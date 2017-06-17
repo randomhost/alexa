@@ -1,5 +1,5 @@
 {
-    "name": "jakubsuchy/amazon-alexa-php",
+    "name": "randomhost/alexa",
     "description": "Amazon Alexa interface for PHP",
     "license": "MIT",
     "type": "library",
@@ -15,6 +15,10 @@
         {
             "name": "Jakub Suchy",
             "email": "info@jsuchy.cz"
+        },
+        {
+            "name": "Ch'Ih-Yu",
+            "email": "chi-yu@web.de"
         }
     ],
     "require": {
@@ -25,7 +29,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Alexa\\" : "src/"
+            "randomhost\\Alexa\\" : "src/"
         }
     }
 }
