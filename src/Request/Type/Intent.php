@@ -1,11 +1,13 @@
 <?php
 
-namespace randomhost\Alexa\Request;
+namespace randomhost\Alexa\Request\Type;
+
+use randomhost\Alexa\Request\Request;
 
 /**
  * Represents an Intent request.
  */
-class IntentRequest extends Request
+class Intent extends Request
 {
     /**
      * Intent name.

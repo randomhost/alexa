@@ -1,10 +1,12 @@
 <?php
 
-namespace randomhost\Alexa\Request;
+namespace randomhost\Alexa\Request\Type;
+
+use randomhost\Alexa\Request\Request;
 
 /**
  * Represents a Launch request.
  */
-class LaunchRequest extends Request
+class Launch extends Request
 {
 }

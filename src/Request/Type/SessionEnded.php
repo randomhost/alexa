@@ -1,13 +1,15 @@
 <?php
 
-namespace randomhost\Alexa\Request;
+namespace randomhost\Alexa\Request\Type;
+
+use randomhost\Alexa\Request\Request;
 
 /**
  * Represents a SessionEnded request
  *
  * @package Alexa\Request
  */
-class SessionEndedRequest extends Request
+class SessionEnded extends Request
 {
     /**
      * Reason why the session was ended.
