@@ -12,14 +12,14 @@ class IntentRequest extends Request
      *
      * @var string
      */
-    public $intentName;
+    protected $intentName;
 
     /**
      * Slots.
      *
      * @var array
      */
-    public $slots = array();
+    protected $slots = array();
 
     /**
      * Constructor.
@@ -33,6 +33,16 @@ class IntentRequest extends Request
         $this
             ->fetchIntentName()
             ->fetchSlots();
+    }
+
+    /**
+     * Returns the Intent name.
+     *
+     * @return string
+     */
+    public function getIntentName()
+    {
+        return $this->intentName;
     }
 
     /**

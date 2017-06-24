@@ -2,6 +2,8 @@
 
 namespace randomhost\Alexa\Response;
 
+use InvalidArgumentException;
+
 /**
  * Represents an OutputSpeech object.
  */
@@ -18,47 +20,112 @@ class OutputSpeech
     const TYPE_SSML = 'SSML';
 
     /**
-     * A string containing the type of output speech to render.
+     * Valid output types.
+     *
+     * @var array
+     */
+    protected $validTypes
+        = array(
+            self::TYPE_PLAIN,
+            self::TYPE_SSML,
+        );
+
+    /**
+     * Type of output speech to render.
      *
      * Must be one of the self::TYPE_* constants.
      *
      * @var string
      */
-    public $type = self::TYPE_PLAIN;
+    protected $type = self::TYPE_PLAIN;
 
     /**
-     * A string containing the speech to render to the user.
+     * Text to speak to the user.
      *
-     * Use this when type is self::TYPE_PLAIN.
+     * This can either be plain text or SSML markup, depending on the value of $this->type;
      *
      * @var string
      */
-    public $text = '';
+    protected $text = '';
 
     /**
-     * A string containing text marked up with SSML to render to the user.
+     * Returns the type.
      *
-     * Use this when type is self::TYPE_SSML.
-     *
-     * @var string
+     * @return string
      */
-    public $ssml = '';
+    public function getType()
+    {
+        return $this->type;
+    }
 
     /**
+     * Sets the output type.
+     *
+     * @param string $type Either self::TYPE_PLAIN or self::TYPE_SSML.
+     *
+     * @return OutputSpeech
+     */
+    public function setType($type)
+    {
+        if (!in_array($type, $this->validTypes)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Unsupported type %s',
+                    var_export($type, true)
+                )
+            );
+        }
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * Returns the text to speak to the user.
+     *
+     * This can either be plain text or SSML markup, depending on the value of $this->type;
+     *
+     * @return string
+     */
+    public function getText()
+    {
+        return $this->text;
+    }
+
+    /**
+     * Sets the text to speak to the user.
+     *
+     * This can either be plain text or SSML markup, depending on the value of $this->type;
+     *
+     * @param string $text Text to speak to the user.
+     *
+     * @return OutputSpeech
+     */
+    public function setText($text)
+    {
+        $this->text = $text;
+
+        return $this;
+    }
+
+    /**
+     * Returns the speech data array.
+     *
      * @return array
      */
     public function render()
     {
         switch ($this->type) {
-            case self::TYPE_PLAIN:
-                return array(
-                    'type' => $this->type,
-                    'text' => $this->text,
-                );
             case self::TYPE_SSML:
                 return array(
                     'type' => $this->type,
-                    'ssml' => $this->ssml,
+                    'ssml' => $this->text,
+                );
+            case self::TYPE_PLAIN:
+            default:
+                return array(
+                    'type' => $this->type,
+                    'text' => $this->text,
                 );
         }
     }

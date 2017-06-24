@@ -12,14 +12,14 @@ class User
      *
      * @var string
      */
-    public $userId;
+    protected $userId;
 
     /**
      * Access token.
      *
      * @var string
      */
-    public $accessToken;
+    protected $accessToken;
 
     /**
      * Constructor.

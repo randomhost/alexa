@@ -16,42 +16,42 @@ class Request
      *
      * @var string
      */
-    public $requestId;
+    protected $requestId;
 
     /**
      * Timestamp.
      *
      * @var string
      */
-    public $timestamp;
+    protected $timestamp;
 
     /**
      * Session instance.
      *
      * @var Session
      */
-    public $session;
+    protected $session;
 
     /**
      * Decoded JSON data.
      *
      * @var mixed[]
      */
-    public $data;
+    protected $data;
 
     /**
      * Raw JSON data.
      *
      * @var string
      */
-    public $rawData;
+    protected $rawData;
 
     /**
      * Application ID.
      *
      * @var string
      */
-    public $applicationId;
+    protected $applicationId;
 
     /**
      * Certificate instance.

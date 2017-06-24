@@ -18,14 +18,14 @@ class Application
      *
      * @var string[]
      */
-    public $applicationId;
+    protected $applicationId = array();
 
     /**
      * Application ID provided with the request.
      *
      * @var string
      */
-    public $requestApplicationId;
+    protected $requestApplicationId = '';
 
     /**
      * Constructor.

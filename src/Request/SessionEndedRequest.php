@@ -14,7 +14,7 @@ class SessionEndedRequest extends Request
      *
      * @var string
      */
-    public $reason;
+    protected $reason = '';
 
     /**
      * Constructor.
@@ -26,6 +26,16 @@ class SessionEndedRequest extends Request
         parent::__construct($rawData);
 
         $this->fetchReason();
+    }
+
+    /**
+     * Returns the reason why the session was ended..
+     *
+     * @return string
+     */
+    public function getReason()
+    {
+        return $this->reason;
     }
 
     /**

@@ -12,28 +12,28 @@ class Session
      *
      * @var User
      */
-    public $user;
+    protected $user;
 
     /**
      * "new" field value.
      *
      * @var null
      */
-    public $new;
+    protected $new;
 
     /**
      * Session ID.
      *
      * @var null
      */
-    public $sessionId;
+    protected $sessionId;
 
     /**
      * Attributes array.
      *
      * @var array
      */
-    public $attributes = array();
+    protected $attributes = array();
 
     /**
      * Session constructor.

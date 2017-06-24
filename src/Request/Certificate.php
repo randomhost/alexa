@@ -52,21 +52,21 @@ class Certificate
      *
      * @var string
      */
-    public $certificateUrl;
+    protected $certificateUrl;
 
     /**
      * Certificate content.
      *
      * @var mixed
      */
-    public $certificateContent;
+    protected $certificateContent;
 
     /**
      * Request signature.
      *
      * @var string
      */
-    public $requestSignature;
+    protected $requestSignature;
 
     /**
      * Certificate constructor.
