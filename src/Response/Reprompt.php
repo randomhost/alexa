@@ -1,17 +1,38 @@
 <?php
 
-namespace Alexa\Response;
+namespace randomhost\Alexa\Response;
 
-class Reprompt {
-	public $outputSpeech;
+/**
+ * Represents a Reprompt response.
+ */
+class Reprompt
+{
+    /**
+     * OutputSpeech instance.
+     *
+     * @var OutputSpeech
+     */
+    protected $outputSpeech;
 
-	public function __construct() {
-		$this->outputSpeech = new OutputSpeech;
-	}
+    /**
+     * Reprompt constructor.
+     *
+     * @param OutputSpeech $outputSpeech OutputSpeech instance.
+     */
+    public function __construct(OutputSpeech $outputSpeech)
+    {
+        $this->outputSpeech = $outputSpeech;
+    }
 
-	public function render() {
-		return array(
-			'outputSpeech' => $this->outputSpeech->render()
-		);
-	}
+    /**
+     * Returns the Reprompt data array.
+     *
+     * @return array
+     */
+    public function render()
+    {
+        return array(
+            'outputSpeech' => $this->outputSpeech->render(),
+        );
+    }
 }

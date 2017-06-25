@@ -1,14 +1,54 @@
 <?php
 
-namespace Alexa\Request;
+namespace randomhost\Alexa\Request;
 
-class User {
-	public $userId;
-	public $accessToken;
+/**
+ * Represents a user.
+ */
+class User
+{
+    /**
+     * User ID.
+     *
+     * @var string
+     */
+    protected $userId;
 
-	public function __construct($data) {
-		$this->userId = isset($data['userId']) ? $data['userId'] : null;
-		$this->accessToken = isset($data['accessToken']) ? $data['accessToken'] : null;
-	}
+    /**
+     * Access token.
+     *
+     * @var string
+     */
+    protected $accessToken;
 
+    /**
+     * Constructor.
+     *
+     * @param array $data User data.
+     */
+    public function __construct($data)
+    {
+        $this->fetchUserId($data);
+        $this->fetchAccessToken($data);
+    }
+
+    /**
+     * Fetches the user ID provided with the request.
+     *
+     * @param array $data Data array.
+     */
+    protected function fetchUserId($data)
+    {
+        $this->userId = isset($data['userId']) ? $data['userId'] : null;
+    }
+
+    /**
+     * Fetches the access token provided with the request.
+     *
+     * @param array $data Data array.
+     */
+    protected function fetchAccessToken($data)
+    {
+        $this->accessToken = isset($data['accessToken']) ? $data['accessToken'] : null;
+    }
 }

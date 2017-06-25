@@ -1,40 +1,69 @@
 <?php
-/**
- * @file Application.php
- *
- * The application abstraction layer to provide Application ID validation to
- * Alexa requests. Any implementations might provide their own implementations
- * via the $request->setApplicationAbstraction() function but must provide the
- * validateApplicationId() function.
- */
 
-namespace Alexa\Request;
+namespace randomhost\Alexa\Request;
+
 use InvalidArgumentException;
 
-class Application {
-	public $applicationId;
-	public $requestApplicationId;
-
-	public function __construct($applicationId) {
-		$this->applicationId = preg_split('/,/', $applicationId);
-	}
-
-	public function setRequestApplicationId($applicationId) {
-		$this->requestApplicationId = $applicationId;
-	}
-
 /**
- * Validate that the request Application ID matches our Application. This is required as per Amazon requirements.
+ * Application abstraction layer providing Application ID validation to Alexa requests.
  *
- * @param $requestApplicationId
-    Application ID from the Request (typically found in $data['session']['application']
+ * Any implementations might provide their own implementations via the
+ * $request->setApplicationAbstraction() function but must provide the
+ * validateApplicationId() function.
  */
-	public function validateApplicationId($requestApplicationId = "") {
-		if (empty($requestApplicationId)) {
-			$requestApplicationId = $this->requestApplicationId;
-		}
-		if (!in_array($requestApplicationId, $this->applicationId)) {
-			throw new InvalidArgumentException('Application Id not matched');
-		}
-	}
+class Application
+{
+    /**
+     * Array of application IDs.
+     *
+     * @var string[]
+     */
+    protected $applicationId = array();
+
+    /**
+     * Application ID provided with the request.
+     *
+     * @var string
+     */
+    protected $requestApplicationId = '';
+
+    /**
+     * Constructor.
+     *
+     * @param string $applicationId Comma separated list of application IDs.
+     */
+    public function __construct($applicationId)
+    {
+        $this->applicationId = explode(',', $applicationId);
+    }
+
+    /**
+     * Sets the application ID provided with the request.
+     *
+     * @param string $applicationId Application ID provided with the request.
+     *
+     * @return $this
+     */
+    public function setRequestApplicationId($applicationId)
+    {
+        $this->requestApplicationId = $applicationId;
+
+        return $this;
+    }
+
+    /**
+     * Validates that the request application ID matches the configured application ID.
+     *
+     * This is required as per Amazon requirements.
+     *
+     * @return $this
+     */
+    public function validateApplicationId()
+    {
+        if (!in_array($this->requestApplicationId, $this->applicationId)) {
+            throw new InvalidArgumentException('Application ID does not match');
+        }
+
+        return $this;
+    }
 }
