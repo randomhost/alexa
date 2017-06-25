@@ -2,8 +2,6 @@
 
 namespace randomhost\Alexa\Response;
 
-use RuntimeException;
-
 /**
  * Represents a Reprompt response.
  */
@@ -30,8 +28,6 @@ class Reprompt
      * Returns the Reprompt data array.
      *
      * @return array
-     *
-     * @throws RuntimeException Thrown if no OutputSpeech instance has been injected.
      */
     public function render()
     {

@@ -26,11 +26,11 @@ class Intent extends Request
     /**
      * Constructor.
      *
-     * @param string $rawData Raw request data.
+     * @param array $data JSON data array.
      */
-    public function __construct($rawData)
+    public function __construct($data)
     {
-        parent::__construct($rawData);
+        parent::__construct($data);
 
         $this
             ->fetchIntentName()
