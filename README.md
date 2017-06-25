@@ -1,4 +1,5 @@
-# Amazon Alexa PHP Library
+randomhost/alexa
+================
 
 This is yet another fork of the `amazon-alexa-php` library by [minicodemonkey][1] / [jakubsuchy][2].
 
@@ -6,14 +7,15 @@ This is yet another fork of the `amazon-alexa-php` library by [minicodemonkey][1
 software. The long term goal is to have a well documented package for working with [Amazon's Alexa][3],
 making use of common standards such as the `PSR-2` coding style.
 
-**Note: The documentation below has not been updated yet.**
+## Requirements
+
+* PHP >= 5.3.0
+* curl
 
 ## Usage
 
-
-
 Install via composer: 
-```php
+```json
 {
     "repositories": [
         {
@@ -27,103 +29,126 @@ Install via composer:
 }
 ```
 
-### Requests
-When Amazon Alexa triggers your skill, a HTTP request will be sent to the URL you specified for your app.
+### Request
 
-You can get the `JSON` body of the request like so:
+When Amazon Alexa triggers your skill, a HTTP request will be sent to the URL you specified for
+your app.
+
+You can retrieve the `JSON` body of the request using standard PHP like so:
+
 ```php
-$applicationId = "your-application-id-from-alexa"; // See developer.amazon.com and your Application. Will start with "amzn1.echo-sdk-ams.app."
-$rawRequest = $request->getContent();
-$alexa = new \Alexa\Request\Request($rawRequest, $applicationId);
-$alexaRequest = $alexa->fromData();
-```
-
-The library expect raw request data, not parsed JSON as it needs to validate the request signature.
-
-You can determine the type of the request with `instanceof`, e.g.:
-```php
-use Alexa\Request\IntentRequest;
-...
-if ($alexaRequest instanceof IntentRequest) {
-	// Handle intent here
-}
-
-// or
-if ($alexaRequest instanceof \Alexa\Request\IntentRequest) {
-	// Handle intent here
+$json = file_get_contents('php://input');
+if (false === $json) {
+    throw new InvalidArgumentException(
+        'Invalid call. No request body.'
+    );
 }
 ```
 
-### Certificate validation
-By default the system validates the request signature by fetching Amazon's signing certificate and decrypting the signature. You need CURL to be able to get the certificate. No caching is done but you can override the Certificate class easily if you want to implement certificate caching yourself based on what your app provides:
+You could also use a framework like Symfony.
 
-Here is a basic example:
+The package comes with a `Factory` which can be used to build the suitable `Request` object for the
+incoming HTTP request:
+
 ```php
-class MyAppCertificate extends \Alexa\Request\Certificate {
-  public function getCertificate() {
-    $cached_certificate = retrieve_cert_from_myapp_cache();
-    if (empty($cached_certificate)) {
-      // Certificate is not cached, download it
-      $cached_ertificate = $this->fetchCertificate();
-      // Cache it now
-    }
-    return $cached_certificate;
-  }
+use randomhost\Alexa\Request\Factory as RequestFactory;
+
+$applicationId = 'your-skill-id';
+
+$factory = new RequestFactory();
+$request = $factory->getInstanceForData(
+    $json,
+    $applicationId
+);
+```
+
+`Factory::getInstanceForData()` requires the following parameters to build a `Request` object:
+
+* `$json`  
+  This parameter refers to the raw unmodified HTTP request body. `Factory` will take care of
+  decoding and validating the data before passing it on to the `Request` object as needed.
+* `$applicationId`  
+   This parameter refers to the unique skill ID which Amazon generated for your skill. Amazon
+   requires this skill ID to match the application ID coming with the HTTP request to verify that
+   the request is handled by the appropriate end point.
+
+`Factory::getInstanceForData()` may throw an `InvalidArgumentException` in the following cases:
+
+* `$json` could not be decoded
+* `$json` does not contain all required data
+* `$json` contains invalid or otherwise unsupported data
+* `$applicationId` does not match the ID that came with the request
+* suspicious HTTP request data (e.g. HTTP request did not originate from the Amazon cloud) 
+
+You can then determine the type of the request with `instanceof`, e.g.:
+
+```php
+use randomhost\Alexa\Request\Type\Launch;
+use randomhost\Alexa\Request\Type\Intent;
+use randomhost\Alexa\Request\Type\SessionEnded;
+
+switch (true) {
+    case ($request instanceof Launch):
+        // say "Hi!", start a PHP session, etc.
+        break;
+        
+    case ($request instanceof Intent):
+        // do what the user asked for
+        break;
+
+    case ($request instanceof SessionEnded):
+        // end session, log errors, etc.
+        break;
+    default:
+        // log error
 }
 ```
-
-And then in your app, use the setCertificateDependency function:
-
-```php
-$certificate = new MyAppCertificate($_SERVER['HTTP_SIGNATURECERTCHAINURL'], $_SERVER['HTTP_SIGNATURE']);
-
-$alexa = new \Alexa\Request\Request($rawRequest);
-$alexa->setCertificateDependency($certificate);
-
-$alexaRequest = $alexa->fromData();
-```
-
-### Application Id validation
-The library will automatically validate your Application Id matches the one of the incoming request - you don't need to do anything for that. If and only if you wish to change how the validation happens, you might use a similar scenario to the certificate validation - provide your own Application class extending the \Alexa\Request\Application and providing a validateApplicationId() function as part of that. Pass your application to the Request library in a same way as the certificate:
-```php
-
-$application = new MyAppApplication($myappId);
-$alexa = new \Alexa\Request\Request($rawRequest, $myappId);
-$alexa->setApplicationDependency($application);
-
-$alexaRequest = $alexa->fromData();
-```
-
 
 ### Response
-You can build an Alexa response with the `Response` class. You can optionally set a card or a reprompt too.
+
+You can build an Alexa response with the `Response` class. You can optionally set a card or a
+reprompt too.
 
 Here's a few examples.
+
 ```php
-$response = new \Alexa\Response\Response;
-$response->respond('Cooool. I\'ll lower the temperature a bit for you!')
-	->withCard('Temperature decreased by 2 degrees');
+use randomhost\Alexa\Response;
+
+$response = new Response();
+$response
+    ->respond('Cooool. I\'ll lower the temperature a bit for you!')
+    ->withCard('Temperature decreased by 2 degrees');
 ```
 
 ```php
-$response = new \Alexa\Response\Response;
-$response->respond('What is your favorite color?')
-	->reprompt('Please tell me your favorite color');
+use randomhost\Alexa\Response;
+
+$response = new Response();
+$response
+    ->respond('What is your favorite color?')
+    ->reprompt('Please tell me your favorite color');
 ```
 
 ```php
-$response = new \Alexa\Response\Response;
-$response->respond('Starting account linking')
-	->withLinkAccount();
+use randomhost\Alexa\Response;
+
+$response = new Response();
+$response
+    ->respond('Starting account linking')
+    ->withLinkAccount();
 ```
 
-To output the response, simply use the `->render()` function
+To output the response, use `Response::render()`.
 
 ```php
 header('Content-Type: application/json');
 echo json_encode($response->render());
 exit;
 ```
+
+**Note:** Make sure that no output is generated by your application before and after rendering the
+response as that would break the JSON response.
+
 
 [1]: https://github.com/MiniCodeMonkey
 [2]: https://github.com/jakubsuchy
