@@ -196,18 +196,34 @@ class Response
      */
     public function render()
     {
-        $cardObject = $this->card ? $this->card : $this->linkAccount;
-
-        return array(
+        // set mandatory parameters
+        $data = array(
             'version' => $this->version,
             'sessionAttributes' => $this->sessionAttributes,
-            'response' => array(
-                'outputSpeech' => $this->outputSpeech ? $this->outputSpeech->render() : null,
-                'card' => $cardObject ? $cardObject->render() : null,
-                'reprompt' => $this->reprompt ? $this->reprompt->render() : null,
-                'shouldEndSession' => $this->shouldEndSession ? true : false,
-            ),
+            'response' => array(),
         );
+
+        // set spoken response
+        if ($this->outputSpeech instanceof OutputSpeech) {
+            $data['response']['outputSpeech'] = $this->outputSpeech->render();
+        }
+
+        // set card response
+        if ($this->card instanceof Card) {
+            $data['response']['card'] = $this->card->render();
+        } elseif ($this->linkAccount instanceof LinkAccount) {
+            $data['response']['card'] = $this->linkAccount->render();
+        }
+
+        // set reprompt
+        if ($this->reprompt instanceof Reprompt) {
+            $data['response']['reprompt'] = $this->reprompt->render();
+        }
+
+        // set "shouldEndSession"
+        $data['response']['shouldEndSession'] = $this->shouldEndSession;
+
+        return $data;
     }
 
     /**
