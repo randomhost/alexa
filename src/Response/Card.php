@@ -58,11 +58,20 @@ class Card
     /**
      * Contents of a card.
      *
-     * Not applicable for cards of self::TYPE_LINK_ACCOUNT.
+     * Not applicable for cards of type self::TYPE_LINK_ACCOUNT.
      *
      * @var string
      */
     protected $content = '';
+
+    /**
+     * Image of a card.
+     *
+     * Only applicable for cards of type self::TYPE_STANDARD.
+     *
+     * @var Image
+     */
+    protected $image;
 
     /**
      * Returns the card type.
@@ -150,6 +159,30 @@ class Card
     }
 
     /**
+     * Returns the Image object.
+     *
+     * @return Image
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * Injects the Image object.
+     *
+     * @param Image $image Image instance.
+     *
+     * @return Card
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    /**
      * Returns the card data array.
      *
      * @return array
@@ -168,6 +201,13 @@ class Card
             $response['content'] = $this->content;
         } elseif ($this->type == self::TYPE_STANDARD) {
             $response['text'] = $this->content;
+
+            if ($this->image instanceof Image) {
+                $imageData = $this->image->render();
+                if (!empty($imageData)) {
+                    $response['image'] = $imageData;
+                }
+            }
         }
 
         return $response;
