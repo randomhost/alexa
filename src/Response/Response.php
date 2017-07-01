@@ -135,19 +135,40 @@ class Response
     }
 
     /**
+
+    /**
      * Add card information.
      *
-     * @param string $title   Card title.
-     * @param string $content Card content.
+     * @param string $title    Card title.
+     * @param string $content  Card content.
+     * @param string $imgLarge Optional: Small image URL.
+     * @param string $imgSmall Optional: Large image URL.
      *
      * @return $this
      */
-    public function withCard($title, $content = '')
+    public function withCard($title, $content = '', $imgLarge = '', $imgSmall = '')
     {
         $this->card = new Card;
         $this->card
+            ->setType(Card::TYPE_SIMPLE)
             ->setTitle($title)
             ->setContent($content);
+
+        if (!empty($imgLarge) || !empty($imgSmall)) {
+            $image = new Image();
+
+            if (!empty($imgLarge)) {
+                $image->setLargeImageUrl($imgLarge);
+            }
+
+            if (!empty($imgSmall)) {
+                $image->setSmallImageUrl($imgSmall);
+            }
+
+            $this->card
+                ->setType(Card::TYPE_STANDARD)
+                ->setImage($image);
+        }
 
         return $this;
     }
