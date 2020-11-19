@@ -256,6 +256,8 @@ class Response
      *
      * @param string $type One of the OutputSpeech::TYPE_* constants.
      * @param string $text Text to speak to the user.
+     *
+     * @return OutputSpeech
      */
     private function getOutputSpeechInstance(string $type, string $text): OutputSpeech
     {

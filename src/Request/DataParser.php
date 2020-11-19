@@ -120,6 +120,8 @@ class DataParser
      * @param array $data JSON data.
      *
      * @throws InvalidArgumentException
+     *
+     * @return string
      */
     public function fetchApplicationId(array $data): string
     {

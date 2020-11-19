@@ -3,6 +3,7 @@
 namespace randomhost\Alexa\Request;
 
 use DateTime;
+use Exception;
 use InvalidArgumentException;
 
 /**
@@ -16,7 +17,7 @@ class Factory
      * @param string $rawData       JSON encoded data.
      * @param string $applicationId Application ID.
      *
-     * @throws InvalidArgumentException
+     * @throws Exception
      *
      * @return Request Appropriate Request class for the request type.
      */
@@ -113,7 +114,7 @@ class Factory
      *
      * @param string $timeStamp Timestamp.
      *
-     * @throws \Exception if DateTime object instantiation fails.
+     * @throws Exception if DateTime object instantiation fails.
      *
      * @return DateTime DateTime instance for the given unix timestamp.
      */
