@@ -42,7 +42,7 @@ abstract class Request
      *
      * @param array $data JSON data array.
      */
-    public function __construct($data)
+    public function __construct(array $data)
     {
         $this->data = $data;
     }
@@ -52,7 +52,7 @@ abstract class Request
      *
      * @return $this
      */
-    public function setRequestId($requestId)
+    public function setRequestId(string $requestId): self
     {
         $this->requestId = $requestId;
 
@@ -64,7 +64,7 @@ abstract class Request
      *
      * @return $this
      */
-    public function setTimestamp(DateTime $timestamp)
+    public function setTimestamp(DateTime $timestamp): self
     {
         $this->timestamp = $timestamp;
 
@@ -76,7 +76,7 @@ abstract class Request
      *
      * @return $this
      */
-    public function setSession(Session $session)
+    public function setSession(Session $session): self
     {
         $this->session = $session;
 

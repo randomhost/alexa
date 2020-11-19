@@ -90,7 +90,7 @@ class Image
      */
     public function render()
     {
-        $response = array();
+        $response = [];
 
         if (!empty($this->smallImageUrl)) {
             $response['smallImageUrl'] = $this->smallImageUrl;
@@ -127,7 +127,7 @@ class Image
         }
 
         $extension = pathinfo($path, PATHINFO_EXTENSION);
-        if (!in_array(strtolower($extension), array('jpeg', 'jpg', 'png'))) {
+        if (!in_array(strtolower($extension), ['jpeg', 'jpg', 'png'])) {
             throw new InvalidArgumentException(
                 'Images must be in JPG or PNG format'
             );

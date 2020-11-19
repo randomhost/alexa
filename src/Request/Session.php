@@ -33,7 +33,7 @@ class Session
      *
      * @var array
      */
-    protected $attributes = array();
+    protected $attributes = [];
 
     /**
      * Session constructor.
@@ -52,9 +52,9 @@ class Session
      * Opens a PHP SESSION using amazon provided sessionId, for storing data about the session.
      * Session cookie won't be sent.
      */
-    public function openSession()
+    public function openSession(): bool
     {
-        ini_set('session.use_cookies', 0); # disable session cookies
+        ini_set('session.use_cookies', 0); // disable session cookies
         session_id($this->parseSessionId($this->sessionId));
 
         return session_start();
@@ -68,13 +68,13 @@ class Session
      *
      * @return mixed
      */
-    public function getAttribute($key, $default = false)
+    public function getAttribute(string $key, $default = false)
     {
         if (array_key_exists($key, $this->attributes)) {
             return $this->attributes[$key];
-        } else {
-            return $default;
         }
+
+        return $default;
     }
 
     /**
@@ -83,16 +83,16 @@ class Session
      *
      * @param string $sessionId Session ID.
      *
-     * @return string
+     * @return string Session ID.
      */
-    protected function parseSessionId($sessionId)
+    protected function parseSessionId(string $sessionId): string
     {
         $prefix = 'SessionId.';
         if (substr($sessionId, 0, strlen($prefix)) == $prefix) {
             return substr($sessionId, strlen($prefix));
-        } else {
-            return $sessionId;
         }
+
+        return $sessionId;
     }
 
     /**
@@ -100,7 +100,7 @@ class Session
      *
      * @param array $data Data array.
      */
-    protected function fetchUser($data)
+    protected function fetchUser($data): void
     {
         $this->user = isset($data['user']) ? new User($data['user']) : null;
     }
@@ -110,9 +110,9 @@ class Session
      *
      * @param array $data Data array.
      */
-    protected function fetchSessionId($data)
+    protected function fetchSessionId($data): void
     {
-        $this->sessionId = isset($data['sessionId']) ? $data['sessionId'] : null;
+        $this->sessionId = $data['sessionId'] ?? null;
     }
 
     /**
@@ -120,9 +120,9 @@ class Session
      *
      * @param array $data Data array.
      */
-    protected function fetchNew($data)
+    protected function fetchNew($data): void
     {
-        $this->new = isset($data['new']) ? $data['new'] : null;
+        $this->new = $data['new'] ?? null;
     }
 
     /**
@@ -130,7 +130,7 @@ class Session
      *
      * @param array $data Data array.
      */
-    protected function fetchAttributes($data)
+    protected function fetchAttributes($data): void
     {
         if (!$this->new && isset($data['attributes'])) {
             $this->attributes = $data['attributes'];

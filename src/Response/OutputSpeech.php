@@ -12,12 +12,12 @@ class OutputSpeech
     /**
      * "PlainText": Indicates that the output speech is defined as plain text.
      */
-    const TYPE_PLAIN = 'PlainText';
+    public const TYPE_PLAIN = 'PlainText';
 
     /**
      * "SSML": Indicates that the output speech is text marked up with SSML.
      */
-    const TYPE_SSML = 'SSML';
+    public const TYPE_SSML = 'SSML';
 
     /**
      * Valid output types.
@@ -25,10 +25,10 @@ class OutputSpeech
      * @var array
      */
     protected $validTypes
-        = array(
+        = [
             self::TYPE_PLAIN,
             self::TYPE_SSML,
-        );
+        ];
 
     /**
      * Type of output speech to render.
@@ -117,16 +117,16 @@ class OutputSpeech
     {
         switch ($this->type) {
             case self::TYPE_SSML:
-                return array(
+                return [
                     'type' => $this->type,
                     'ssml' => $this->text,
-                );
+                ];
             case self::TYPE_PLAIN:
             default:
-                return array(
+                return [
                     'type' => $this->type,
                     'text' => $this->text,
-                );
+                ];
         }
     }
 }

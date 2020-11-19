@@ -19,35 +19,35 @@ class Response
      *
      * @var array
      */
-    protected $sessionAttributes = array();
+    protected $sessionAttributes = [];
 
     /**
      * OutputSpeech instance.
      *
      * @var null|OutputSpeech
      */
-    protected $outputSpeech = null;
+    protected $outputSpeech;
 
     /**
      * Card instance.
      *
      * @var null|Card
      */
-    protected $card = null;
+    protected $card;
 
     /**
      * LinkAccount instance.
      *
      * @var null|LinkAccount
      */
-    protected $linkAccount = null;
+    protected $linkAccount;
 
     /**
      * Reprompt instance.
      *
      * @var null|Reprompt
      */
-    protected $reprompt = null;
+    protected $reprompt;
 
     /**
      * Defines whether the session should be ended after this response.
@@ -61,7 +61,7 @@ class Response
      */
     public function __construct()
     {
-        $this->outputSpeech = new OutputSpeech;
+        $this->outputSpeech = new OutputSpeech();
     }
 
     /**
@@ -73,7 +73,7 @@ class Response
      */
     public function respond($text)
     {
-        $this->outputSpeech = new OutputSpeech;
+        $this->outputSpeech = new OutputSpeech();
         $this->outputSpeech->setType(OutputSpeech::TYPE_PLAIN);
         $this->outputSpeech->setText($text);
 
@@ -89,7 +89,7 @@ class Response
      */
     public function respondSSML($ssml)
     {
-        $this->outputSpeech = new OutputSpeech;
+        $this->outputSpeech = new OutputSpeech();
         $this->outputSpeech->setType(OutputSpeech::TYPE_SSML);
         $this->outputSpeech->setText($ssml);
 
@@ -135,8 +135,7 @@ class Response
     }
 
     /**
-
-    /**
+     * /**
      * Add card information.
      *
      * @param string $title    Card title.
@@ -148,11 +147,12 @@ class Response
      */
     public function withCard($title, $content = '', $imgLarge = '', $imgSmall = '')
     {
-        $this->card = new Card;
+        $this->card = new Card();
         $this->card
             ->setType(Card::TYPE_SIMPLE)
             ->setTitle($title)
-            ->setContent($content);
+            ->setContent($content)
+        ;
 
         if (!empty($imgLarge) || !empty($imgSmall)) {
             $image = new Image();
@@ -167,7 +167,8 @@ class Response
 
             $this->card
                 ->setType(Card::TYPE_STANDARD)
-                ->setImage($image);
+                ->setImage($image)
+            ;
         }
 
         return $this;
@@ -180,7 +181,7 @@ class Response
      */
     public function withLinkAccount()
     {
-        $this->linkAccount = new LinkAccount;
+        $this->linkAccount = new LinkAccount();
 
         return $this;
     }
@@ -218,11 +219,11 @@ class Response
     public function render()
     {
         // set mandatory parameters
-        $data = array(
+        $data = [
             'version' => $this->version,
             'sessionAttributes' => $this->sessionAttributes,
-            'response' => array(),
-        );
+            'response' => [],
+        ];
 
         // set spoken response
         if ($this->outputSpeech instanceof OutputSpeech) {

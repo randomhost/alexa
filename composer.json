@@ -22,14 +22,14 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "~4.6"
+        "php": ">=7.3.0",
+        "ext-json": "*",
+        "ext-openssl": "*",
+        "ext-curl": "*"
     },
     "autoload": {
         "psr-4": {
-            "randomhost\\Alexa\\" : "src/"
+            "randomhost\\Alexa\\": "src/"
         }
     }
 }

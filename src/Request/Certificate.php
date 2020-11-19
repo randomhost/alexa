@@ -3,6 +3,7 @@
 namespace randomhost\Alexa\Request;
 
 use DateTime;
+use Exception;
 use InvalidArgumentException;
 
 /**
@@ -15,37 +16,37 @@ class Certificate
     /**
      * Maximum acceptable difference between timestamps.
      */
-    const TIMESTAMP_VALID_TOLERANCE_SECONDS = 30;
+    private const TIMESTAMP_VALID_TOLERANCE_SECONDS = 30;
 
     /**
      * Protocol to validate against.
      */
-    const SIGNATURE_VALID_PROTOCOL = 'https';
+    private const SIGNATURE_VALID_PROTOCOL = 'https';
 
     /**
      * Hostname to validate against.
      */
-    const SIGNATURE_VALID_HOSTNAME = 's3.amazonaws.com';
+    private const SIGNATURE_VALID_HOSTNAME = 's3.amazonaws.com';
 
     /**
      * Path to validate against.
      */
-    const SIGNATURE_VALID_PATH = '/echo.api/';
+    private const SIGNATURE_VALID_PATH = '/echo.api/';
 
     /**
      * Port to validate against.
      */
-    const SIGNATURE_VALID_PORT = 443;
+    private const SIGNATURE_VALID_PORT = 443;
 
     /**
      * Service domain to validate against.
      */
-    const ECHO_SERVICE_DOMAIN = 'echo-api.amazon.com';
+    private const ECHO_SERVICE_DOMAIN = 'echo-api.amazon.com';
 
     /**
      * Encryption method.
      */
-    const ENCRYPT_METHOD = "sha1WithRSAEncryption";
+    private const ENCRYPT_METHOD = 'sha1WithRSAEncryption';
 
     /**
      * Certificate URL.
@@ -74,7 +75,7 @@ class Certificate
      * @param string $certificateUrl Certificate URL.
      * @param string $signature      Certificate signature.
      */
-    public function __construct($certificateUrl, $signature)
+    public function __construct(string $certificateUrl, string $signature)
     {
         $this->certificateUrl = $certificateUrl;
         $this->requestSignature = $signature;
@@ -85,9 +86,10 @@ class Certificate
      *
      * @param string $requestData JSON encoded string.
      *
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException if the certificate is invalid.
+     * @throws Exception                if DateTime object instantiation fails.
      */
-    public function validateRequest($requestData)
+    public function validateRequest(string $requestData): void
     {
         $requestParsed = json_decode($requestData, true);
 
@@ -97,9 +99,11 @@ class Certificate
                 ->validateTimestamp($requestParsed['request']['timestamp'])
                 ->verifySignatureCertificateURL()
                 ->validateCertificate()
-                ->validateRequestSignature($requestData);
+                ->validateRequestSignature($requestData)
+            ;
         } catch (InvalidArgumentException $e) {
             http_response_code(400);
+
             throw $e;
         }
 
@@ -111,11 +115,11 @@ class Certificate
      *
      * @param mixed $requestParsed Request data as returned by json_decode().
      *
-     * @return $this
+     * @throws InvalidArgumentException if the request dost not contain a timestamp.
      *
-     * @throws InvalidArgumentException
+     * @return $this
      */
-    protected function validateDataFormat($requestParsed)
+    protected function validateDataFormat($requestParsed): self
     {
         if (!is_array($requestParsed)) {
             throw new InvalidArgumentException(
@@ -137,13 +141,14 @@ class Certificate
      *
      * @param string $timestamp Timestamp.
      *
-     * @return $this
+     * @throws Exception                if DateTime object instantiation fails.
+     * @throws InvalidArgumentException if the the timestamp is too old.
      *
-     * @throws InvalidArgumentException
+     * @return $this
      */
-    protected function validateTimestamp($timestamp)
+    protected function validateTimestamp(string $timestamp): self
     {
-        $now = new DateTime;
+        $now = new DateTime();
         $timestamp = new DateTime($timestamp);
         $differenceInSeconds = $now->getTimestamp() - $timestamp->getTimestamp();
 
@@ -159,16 +164,16 @@ class Certificate
     /**
      * Validates the certificate.
      *
-     * @return $this
+     * @throws InvalidArgumentException if the remote certificate is not found.
      *
-     * @throws InvalidArgumentException
+     * @return $this
      */
-    protected function validateCertificate()
+    protected function validateCertificate(): self
     {
         $this->certificateContent = $this->getCertificate();
         $parsedCertificate = $this->parseCertificate($this->certificateContent);
 
-        if ($parsedCertificate == null) {
+        if (null == $parsedCertificate) {
             throw new InvalidArgumentException(
                 'Remote certificate was not found'
             );
@@ -176,7 +181,8 @@ class Certificate
 
         $this
             ->validateCertificateDate($parsedCertificate)
-            ->validateCertificateSAN($parsedCertificate, static::ECHO_SERVICE_DOMAIN);
+            ->validateCertificateSAN($parsedCertificate, static::ECHO_SERVICE_DOMAIN)
+        ;
 
         return $this;
     }
@@ -186,11 +192,11 @@ class Certificate
      *
      * @param string $requestData Request data string.
      *
-     * @return $this
+     * @throws InvalidArgumentException if the request signature could not be verified.
      *
-     * @throws InvalidArgumentException
+     * @return $this
      */
-    protected function validateRequestSignature($requestData)
+    protected function validateRequestSignature(string $requestData): self
     {
         $certKey = openssl_pkey_get_public($this->certificateContent);
 
@@ -212,11 +218,11 @@ class Certificate
      *
      * @param array $parsedCertificate Parsed certificate data.
      *
-     * @return $this
+     * @throws InvalidArgumentException if the remote certificate has expired.
      *
-     * @throws InvalidArgumentException
+     * @return $this
      */
-    protected function validateCertificateDate(array $parsedCertificate)
+    protected function validateCertificateDate(array $parsedCertificate): self
     {
         $validFrom = $parsedCertificate['validFrom_time_t'];
         $validTo = $parsedCertificate['validTo_time_t'];
@@ -237,11 +243,11 @@ class Certificate
      * @param array  $parsedCertificate   Parsed certificate data.
      * @param string $amazonServiceDomain Amazon service domain.
      *
-     * @return $this
+     * @throws InvalidArgumentException if the remote certificate does not contain a valid SAN.
      *
-     * @throws InvalidArgumentException
+     * @return $this
      */
-    protected function validateCertificateSAN(array $parsedCertificate, $amazonServiceDomain)
+    protected function validateCertificateSAN(array $parsedCertificate, string $amazonServiceDomain): self
     {
         if (!isset($parsedCertificate['extensions']['subjectAltName'])
             || false === strpos(
@@ -262,11 +268,11 @@ class Certificate
      *
      * @author Emanuele Corradini <emanuele@evensi.com>
      *
-     * @return $this
+     * @throws InvalidArgumentException if the URL of the certificate contains invalid data.
      *
-     * @throws InvalidArgumentException
+     * @return $this
      */
-    protected function verifySignatureCertificateURL()
+    protected function verifySignatureCertificateURL(): self
     {
         $url = parse_url($this->certificateUrl);
 
@@ -278,36 +284,33 @@ class Certificate
                     var_export($url['scheme'], true)
                 )
             );
-        } else {
-            if ($url['host'] !== static::SIGNATURE_VALID_HOSTNAME) {
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'Invalid host name. Expected %s, got %s',
-                        var_export(static::SIGNATURE_VALID_HOSTNAME, true),
-                        var_export($url['host'], true)
-                    )
-                );
-            } else {
-                if (strpos($url['path'], static::SIGNATURE_VALID_PATH) !== 0) {
-                    throw new InvalidArgumentException(
-                        sprintf(
-                            'Invalid path. Must start with %s, got %s',
-                            var_export(static::SIGNATURE_VALID_PATH, true),
-                            var_export($url['path'], true)
-                        )
-                    );
-                } else {
-                    if (isset($url['port']) && $url['port'] !== static::SIGNATURE_VALID_PORT) {
-                        throw new InvalidArgumentException(
-                            sprintf(
-                                'Invalid port. Expected %s, got %s',
-                                var_export(static::SIGNATURE_VALID_PORT, true),
-                                var_export($url['port'], true)
-                            )
-                        );
-                    }
-                }
-            }
+        }
+        if ($url['host'] !== static::SIGNATURE_VALID_HOSTNAME) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Invalid host name. Expected %s, got %s',
+                    var_export(static::SIGNATURE_VALID_HOSTNAME, true),
+                    var_export($url['host'], true)
+                )
+            );
+        }
+        if (0 !== strpos($url['path'], static::SIGNATURE_VALID_PATH)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Invalid path. Must start with %s, got %s',
+                    var_export(static::SIGNATURE_VALID_PATH, true),
+                    var_export($url['path'], true)
+                )
+            );
+        }
+        if (isset($url['port']) && $url['port'] !== static::SIGNATURE_VALID_PORT) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Invalid port. Expected %s, got %s',
+                    var_export(static::SIGNATURE_VALID_PORT, true),
+                    var_export($url['port'], true)
+                )
+            );
         }
 
         return $this;

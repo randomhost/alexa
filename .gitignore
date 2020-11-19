@@ -8,3 +8,4 @@ coverage/
 .idea/
 
 composer.lock
+.php_cs.cache

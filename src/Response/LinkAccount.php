@@ -14,8 +14,8 @@ class LinkAccount
      */
     public function render()
     {
-        return array(
+        return [
             'type' => 'LinkAccount',
-        );
+        ];
     }
 }

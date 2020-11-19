@@ -12,18 +12,18 @@ class Card
     /**
      * Type "Simple": A card that contains a title and plain text content.
      */
-    const TYPE_SIMPLE = 'Simple';
+    public const TYPE_SIMPLE = 'Simple';
 
     /**
      * Type "Standard": A card that contains a title, text content, and an image to display.
      */
-    const TYPE_STANDARD = 'Standard';
+    public const TYPE_STANDARD = 'Standard';
 
     /**
      * Type "LinkAccount": A card that displays a link to an authorization URL that the user can
      * use to link their Alexa account with a user in another system.
      */
-    const TYPE_LINK_ACCOUNT = 'LinkAccount';
+    public const TYPE_LINK_ACCOUNT = 'LinkAccount';
 
     /**
      * Valid card types.
@@ -31,11 +31,11 @@ class Card
      * @var array
      */
     protected $validTypes
-        = array(
+        = [
             self::TYPE_SIMPLE,
             self::TYPE_STANDARD,
             self::TYPE_LINK_ACCOUNT,
-        );
+        ];
 
     /**
      * Type of card to render.
@@ -129,7 +129,7 @@ class Card
      */
     public function setTitle($title)
     {
-        $this->title = (string)$title;
+        $this->title = (string) $title;
 
         return $this;
     }
@@ -153,7 +153,7 @@ class Card
      */
     public function setContent($content)
     {
-        $this->content = (string)$content;
+        $this->content = (string) $content;
 
         return $this;
     }
@@ -189,17 +189,17 @@ class Card
      */
     public function render()
     {
-        $response = array();
+        $response = [];
 
         $response['type'] = $this->type;
 
-        if ($this->type !== self::TYPE_LINK_ACCOUNT) {
+        if (self::TYPE_LINK_ACCOUNT !== $this->type) {
             $response['title'] = $this->title;
         }
 
-        if ($this->type == self::TYPE_SIMPLE) {
+        if (self::TYPE_SIMPLE == $this->type) {
             $response['content'] = $this->content;
-        } elseif ($this->type == self::TYPE_STANDARD) {
+        } elseif (self::TYPE_STANDARD == $this->type) {
             $response['text'] = $this->content;
 
             if ($this->image instanceof Image) {
