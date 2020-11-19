@@ -3,6 +3,7 @@
 namespace randomhost\Alexa\Request;
 
 use DateTime;
+use Exception;
 use InvalidArgumentException;
 
 /**
@@ -16,11 +17,11 @@ class Factory
      * @param string $rawData       JSON encoded data.
      * @param string $applicationId Application ID.
      *
-     * @return Request Appropriate Request class for the request type.
+     * @throws Exception
      *
-     * @throws InvalidArgumentException
+     * @return Request Appropriate Request class for the request type.
      */
-    public function getInstanceForData($rawData, $applicationId)
+    public function getInstanceForData(string $rawData, string $applicationId): Request
     {
         // parse JSON data
         $parser = $this->buildDataParser();
@@ -36,11 +37,13 @@ class Factory
         // validate application ID
         $this->buildApplication($applicationId)
             ->setRequestApplicationId($requestApplicationId)
-            ->validateApplicationId();
+            ->validateApplicationId()
+        ;
 
         // validate certificate
         $this->buildCertificate()
-            ->validateRequest($rawData);
+            ->validateRequest($rawData)
+        ;
 
         // build Session
         $session = $this->buildSession($sessionData);
@@ -53,7 +56,8 @@ class Factory
         $request
             ->setRequestId($requestId)
             ->setTimestamp($dateTime)
-            ->setSession($session);
+            ->setSession($session)
+        ;
 
         return $request;
     }
@@ -61,9 +65,9 @@ class Factory
     /**
      * Returns a new DataParser instance.
      *
-     * @return DataParser
+     * @return DataParser DataParser instance.
      */
-    private function buildDataParser()
+    private function buildDataParser(): DataParser
     {
         return new DataParser();
     }
@@ -73,9 +77,9 @@ class Factory
      *
      * @param string $requestApplicationId Application ID from request data.
      *
-     * @return Application
+     * @return Application Application instance.
      */
-    private function buildApplication($requestApplicationId)
+    private function buildApplication(string $requestApplicationId): Application
     {
         return new Application($requestApplicationId);
     }
@@ -83,9 +87,9 @@ class Factory
     /**
      * Returns a new Certificate instance.
      *
-     * @return Certificate
+     * @return Certificate Certificate instance.
      */
-    private function buildCertificate()
+    private function buildCertificate(): Certificate
     {
         return new Certificate(
             $_SERVER['HTTP_SIGNATURECERTCHAINURL'],
@@ -98,13 +102,11 @@ class Factory
      *
      * @param array $sessionData Session data.
      *
-     * @return Session
+     * @return Session Session instance, filled with given session data.
      */
-    private function buildSession(array $sessionData)
+    private function buildSession(array $sessionData): Session
     {
-        $session = new Session($sessionData);
-
-        return $session;
+        return new Session($sessionData);
     }
 
     /**
@@ -112,9 +114,11 @@ class Factory
      *
      * @param string $timeStamp Timestamp.
      *
-     * @return DateTime
+     * @throws Exception if DateTime object instantiation fails.
+     *
+     * @return DateTime DateTime instance for the given unix timestamp.
      */
-    private function buildDateTime($timeStamp)
+    private function buildDateTime(string $timeStamp): DateTime
     {
         return new DateTime($timeStamp);
     }
@@ -125,9 +129,9 @@ class Factory
      * @param string $requestType Request type.
      * @param array  $data        JSON data array.
      *
-     * @return Request
+     * @return Request Appropriate Request implementation for the given parameters.
      */
-    private function buildRequest($requestType, array $data)
+    private function buildRequest(string $requestType, array $data): Request
     {
         $className = $this->buildRequestClassName($requestType);
 
@@ -139,12 +143,12 @@ class Factory
      *
      * @param string $requestType Raw request type.
      *
-     * @return string
+     * @return string Full class path of an appropriate Request implementation.
      */
-    private function buildRequestClassName($requestType)
+    private function buildRequestClassName(string $requestType): string
     {
         $suffixPos = strrpos($requestType, 'Request');
-        if ($suffixPos === false) {
+        if (false === $suffixPos) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Malformed request type %s',

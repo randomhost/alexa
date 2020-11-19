@@ -9,7 +9,7 @@ making use of common standards such as the `PSR-2` coding style.
 
 ## Requirements
 
-* PHP >= 5.3.0
+* PHP >= 7.3.0
 * curl
 
 ## Usage

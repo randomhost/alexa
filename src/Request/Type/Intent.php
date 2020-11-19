@@ -21,20 +21,21 @@ class Intent extends Request
      *
      * @var array
      */
-    protected $slots = array();
+    protected $slots = [];
 
     /**
      * Constructor.
      *
      * @param array $data JSON data array.
      */
-    public function __construct($data)
+    public function __construct(array $data)
     {
         parent::__construct($data);
 
         $this
             ->fetchIntentName()
-            ->fetchSlots();
+            ->fetchSlots()
+        ;
     }
 
     /**
@@ -42,7 +43,7 @@ class Intent extends Request
      *
      * @return string
      */
-    public function getIntentName()
+    public function getIntentName(): string
     {
         return $this->intentName;
     }
@@ -55,13 +56,13 @@ class Intent extends Request
      *
      * @return mixed
      */
-    public function getSlot($name, $default = false)
+    public function getSlot(string $name, $default = false)
     {
         if (array_key_exists($name, $this->slots)) {
             return $this->slots[$name];
-        } else {
-            return $default;
         }
+
+        return $default;
     }
 
     /**
@@ -69,7 +70,7 @@ class Intent extends Request
      *
      * @return $this
      */
-    protected function fetchIntentName()
+    protected function fetchIntentName(): self
     {
         if (isset($this->data['request']['intent']['name'])) {
             $this->intentName = $this->data['request']['intent']['name'];
@@ -83,7 +84,7 @@ class Intent extends Request
      *
      * @return $this
      */
-    protected function fetchSlots()
+    protected function fetchSlots(): self
     {
         if (isset($this->data['request']['intent']['slots'])) {
             foreach ($this->data['request']['intent']['slots'] as $slot) {

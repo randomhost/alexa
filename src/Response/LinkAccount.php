@@ -9,13 +9,10 @@ namespace randomhost\Alexa\Response;
  */
 class LinkAccount
 {
-    /**
-     * @return array
-     */
-    public function render()
+    public function render(): array
     {
-        return array(
+        return [
             'type' => 'LinkAccount',
-        );
+        ];
     }
 }

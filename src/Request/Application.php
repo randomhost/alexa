@@ -18,7 +18,7 @@ class Application
      *
      * @var string[]
      */
-    protected $applicationId = array();
+    protected $applicationId = [];
 
     /**
      * Application ID provided with the request.
@@ -32,7 +32,7 @@ class Application
      *
      * @param string $applicationId Comma separated list of application IDs.
      */
-    public function __construct($applicationId)
+    public function __construct(string $applicationId)
     {
         $this->applicationId = explode(',', $applicationId);
     }
@@ -44,7 +44,7 @@ class Application
      *
      * @return $this
      */
-    public function setRequestApplicationId($applicationId)
+    public function setRequestApplicationId(string $applicationId): self
     {
         $this->requestApplicationId = $applicationId;
 
@@ -58,7 +58,7 @@ class Application
      *
      * @return $this
      */
-    public function validateApplicationId()
+    public function validateApplicationId(): self
     {
         if (!in_array($this->requestApplicationId, $this->applicationId)) {
             throw new InvalidArgumentException('Application ID does not match');

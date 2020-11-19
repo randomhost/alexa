@@ -12,18 +12,18 @@ class Card
     /**
      * Type "Simple": A card that contains a title and plain text content.
      */
-    const TYPE_SIMPLE = 'Simple';
+    public const TYPE_SIMPLE = 'Simple';
 
     /**
      * Type "Standard": A card that contains a title, text content, and an image to display.
      */
-    const TYPE_STANDARD = 'Standard';
+    public const TYPE_STANDARD = 'Standard';
 
     /**
      * Type "LinkAccount": A card that displays a link to an authorization URL that the user can
      * use to link their Alexa account with a user in another system.
      */
-    const TYPE_LINK_ACCOUNT = 'LinkAccount';
+    public const TYPE_LINK_ACCOUNT = 'LinkAccount';
 
     /**
      * Valid card types.
@@ -31,11 +31,11 @@ class Card
      * @var array
      */
     protected $validTypes
-        = array(
+        = [
             self::TYPE_SIMPLE,
             self::TYPE_STANDARD,
             self::TYPE_LINK_ACCOUNT,
-        );
+        ];
 
     /**
      * Type of card to render.
@@ -75,10 +75,8 @@ class Card
 
     /**
      * Returns the card type.
-     *
-     * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -88,9 +86,9 @@ class Card
      *
      * @param string $type One of the self::TYPE_* constants.
      *
-     * @return Card
+     * @return $this
      */
-    public function setType($type)
+    public function setType(string $type): self
     {
         if (!in_array($type, $this->validTypes)) {
             throw new InvalidArgumentException(
@@ -110,10 +108,8 @@ class Card
      * Returns the card title.
      *
      * Not applicable for cards of type self::TYPE_LINK_ACCOUNT.
-     *
-     * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -125,21 +121,19 @@ class Card
      *
      * @param string $title Card title.
      *
-     * @return Card
+     * @return $this
      */
-    public function setTitle($title)
+    public function setTitle($title): self
     {
-        $this->title = (string)$title;
+        $this->title = (string) $title;
 
         return $this;
     }
 
     /**
      * Returns the card content.
-     *
-     * @return string
      */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
@@ -149,11 +143,11 @@ class Card
      *
      * @param string $content Card content.
      *
-     * @return Card
+     * @return $this
      */
-    public function setContent($content)
+    public function setContent($content): self
     {
-        $this->content = (string)$content;
+        $this->content = (string) $content;
 
         return $this;
     }
@@ -163,7 +157,7 @@ class Card
      *
      * @return Image
      */
-    public function getImage()
+    public function getImage(): ?Image
     {
         return $this->image;
     }
@@ -173,9 +167,9 @@ class Card
      *
      * @param Image $image Image instance.
      *
-     * @return Card
+     * @return $this
      */
-    public function setImage($image)
+    public function setImage(Image $image): self
     {
         $this->image = $image;
 
@@ -184,22 +178,20 @@ class Card
 
     /**
      * Returns the card data array.
-     *
-     * @return array
      */
-    public function render()
+    public function render(): array
     {
-        $response = array();
+        $response = [];
 
         $response['type'] = $this->type;
 
-        if ($this->type !== self::TYPE_LINK_ACCOUNT) {
+        if (self::TYPE_LINK_ACCOUNT !== $this->type) {
             $response['title'] = $this->title;
         }
 
-        if ($this->type == self::TYPE_SIMPLE) {
+        if (self::TYPE_SIMPLE == $this->type) {
             $response['content'] = $this->content;
-        } elseif ($this->type == self::TYPE_STANDARD) {
+        } elseif (self::TYPE_STANDARD == $this->type) {
             $response['text'] = $this->content;
 
             if ($this->image instanceof Image) {

@@ -37,9 +37,9 @@ class User
      *
      * @param array $data Data array.
      */
-    protected function fetchUserId($data)
+    protected function fetchUserId(array $data): void
     {
-        $this->userId = isset($data['userId']) ? $data['userId'] : null;
+        $this->userId = $data['userId'] ?? null;
     }
 
     /**
@@ -47,8 +47,8 @@ class User
      *
      * @param array $data Data array.
      */
-    protected function fetchAccessToken($data)
+    protected function fetchAccessToken($data): void
     {
-        $this->accessToken = isset($data['accessToken']) ? $data['accessToken'] : null;
+        $this->accessToken = $data['accessToken'] ?? null;
     }
 }
