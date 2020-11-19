@@ -50,10 +50,8 @@ class OutputSpeech
 
     /**
      * Returns the type.
-     *
-     * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -63,9 +61,9 @@ class OutputSpeech
      *
      * @param string $type Either self::TYPE_PLAIN or self::TYPE_SSML.
      *
-     * @return OutputSpeech
+     * @return $this
      */
-    public function setType($type)
+    public function setType($type): self
     {
         if (!in_array($type, $this->validTypes)) {
             throw new InvalidArgumentException(
@@ -84,10 +82,8 @@ class OutputSpeech
      * Returns the text to speak to the user.
      *
      * This can either be plain text or SSML markup, depending on the value of $this->type;
-     *
-     * @return string
      */
-    public function getText()
+    public function getText(): string
     {
         return $this->text;
     }
@@ -99,9 +95,9 @@ class OutputSpeech
      *
      * @param string $text Text to speak to the user.
      *
-     * @return OutputSpeech
+     * @return $this
      */
-    public function setText($text)
+    public function setText(string $text): self
     {
         $this->text = $text;
 
@@ -110,10 +106,8 @@ class OutputSpeech
 
     /**
      * Returns the speech data array.
-     *
-     * @return array
      */
-    public function render()
+    public function render(): array
     {
         switch ($this->type) {
             case self::TYPE_SSML:

@@ -26,10 +26,8 @@ class Reprompt
 
     /**
      * Returns the Reprompt data array.
-     *
-     * @return array
      */
-    public function render()
+    public function render(): array
     {
         return [
             'outputSpeech' => $this->outputSpeech->render(),

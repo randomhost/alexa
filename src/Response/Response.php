@@ -71,7 +71,7 @@ class Response
      *
      * @return $this
      */
-    public function respond($text)
+    public function respond(string $text): self
     {
         $this->outputSpeech = new OutputSpeech();
         $this->outputSpeech->setType(OutputSpeech::TYPE_PLAIN);
@@ -87,7 +87,7 @@ class Response
      *
      * @return $this
      */
-    public function respondSSML($ssml)
+    public function respondSSML(string $ssml): self
     {
         $this->outputSpeech = new OutputSpeech();
         $this->outputSpeech->setType(OutputSpeech::TYPE_SSML);
@@ -103,7 +103,7 @@ class Response
      *
      * @return $this
      */
-    public function reprompt($text)
+    public function reprompt(string $text): self
     {
         $outputSpeech = $this->getOutputSpeechInstance(
             OutputSpeech::TYPE_PLAIN,
@@ -122,7 +122,7 @@ class Response
      *
      * @return $this
      */
-    public function repromptSSML($ssml)
+    public function repromptSSML(string $ssml): self
     {
         $outputSpeech = $this->getOutputSpeechInstance(
             OutputSpeech::TYPE_SSML,
@@ -135,7 +135,6 @@ class Response
     }
 
     /**
-     * /**
      * Add card information.
      *
      * @param string $title    Card title.
@@ -145,7 +144,7 @@ class Response
      *
      * @return $this
      */
-    public function withCard($title, $content = '', $imgLarge = '', $imgSmall = '')
+    public function withCard(string $title, string $content = '', string $imgLarge = '', string $imgSmall = ''): self
     {
         $this->card = new Card();
         $this->card
@@ -179,7 +178,7 @@ class Response
      *
      * @return $this
      */
-    public function withLinkAccount()
+    public function withLinkAccount(): self
     {
         $this->linkAccount = new LinkAccount();
 
@@ -193,7 +192,7 @@ class Response
      *
      * @return $this
      */
-    public function endSession($shouldEndSession = true)
+    public function endSession(bool $shouldEndSession = true): self
     {
         $this->shouldEndSession = $shouldEndSession;
 
@@ -205,10 +204,14 @@ class Response
      *
      * @param string $key   Attribute key.
      * @param mixed  $value Attribute value.
+     *
+     * @return $this
      */
-    public function addSessionAttribute($key, $value)
+    public function addSessionAttribute(string $key, $value): self
     {
         $this->sessionAttributes[$key] = $value;
+
+        return $this;
     }
 
     /**
@@ -216,7 +219,7 @@ class Response
      *
      * @return array
      */
-    public function render()
+    public function render(): array
     {
         // set mandatory parameters
         $data = [
@@ -253,10 +256,8 @@ class Response
      *
      * @param string $type One of the OutputSpeech::TYPE_* constants.
      * @param string $text Text to speak to the user.
-     *
-     * @return OutputSpeech
      */
-    private function getOutputSpeechInstance($type, $text)
+    private function getOutputSpeechInstance(string $type, string $text): OutputSpeech
     {
         $outputSpeech = new OutputSpeech();
         $outputSpeech->setType($type);

@@ -29,10 +29,8 @@ class Image
 
     /**
      * Returns the small card image URL.
-     *
-     * @return string
      */
-    public function getSmallImageUrl()
+    public function getSmallImageUrl(): string
     {
         return $this->smallImageUrl;
     }
@@ -44,9 +42,9 @@ class Image
      *
      * @param string $imageUrl Small card image URL.
      *
-     * @return Image
+     * @return $this
      */
-    public function setSmallImageUrl($imageUrl)
+    public function setSmallImageUrl(string $imageUrl): self
     {
         $this->validateImage($imageUrl);
 
@@ -57,10 +55,8 @@ class Image
 
     /**
      * Sets the large card image URL.
-     *
-     * @return string
      */
-    public function getLargeImageUrl()
+    public function getLargeImageUrl(): string
     {
         return $this->largeImageUrl;
     }
@@ -72,9 +68,9 @@ class Image
      *
      * @param string $imageUrl Large card image URL.
      *
-     * @return Image
+     * @return $this
      */
-    public function setLargeImageUrl($imageUrl)
+    public function setLargeImageUrl(string $imageUrl): self
     {
         $this->validateImage($imageUrl);
 
@@ -85,10 +81,8 @@ class Image
 
     /**
      * Returns the card data array.
-     *
-     * @return array
      */
-    public function render()
+    public function render(): array
     {
         $response = [];
 
@@ -110,7 +104,7 @@ class Image
      *
      * @return $this
      */
-    protected function validateImage($imageUrl)
+    protected function validateImage(string $imageUrl): self
     {
         $protocol = parse_url($imageUrl, PHP_URL_SCHEME);
         if ('https' !== $protocol) {

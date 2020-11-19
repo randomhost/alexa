@@ -75,10 +75,8 @@ class Card
 
     /**
      * Returns the card type.
-     *
-     * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -88,9 +86,9 @@ class Card
      *
      * @param string $type One of the self::TYPE_* constants.
      *
-     * @return Card
+     * @return $this
      */
-    public function setType($type)
+    public function setType(string $type): self
     {
         if (!in_array($type, $this->validTypes)) {
             throw new InvalidArgumentException(
@@ -110,10 +108,8 @@ class Card
      * Returns the card title.
      *
      * Not applicable for cards of type self::TYPE_LINK_ACCOUNT.
-     *
-     * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -125,9 +121,9 @@ class Card
      *
      * @param string $title Card title.
      *
-     * @return Card
+     * @return $this
      */
-    public function setTitle($title)
+    public function setTitle($title): self
     {
         $this->title = (string) $title;
 
@@ -136,10 +132,8 @@ class Card
 
     /**
      * Returns the card content.
-     *
-     * @return string
      */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
@@ -149,9 +143,9 @@ class Card
      *
      * @param string $content Card content.
      *
-     * @return Card
+     * @return $this
      */
-    public function setContent($content)
+    public function setContent($content): self
     {
         $this->content = (string) $content;
 
@@ -163,7 +157,7 @@ class Card
      *
      * @return Image
      */
-    public function getImage()
+    public function getImage(): ?Image
     {
         return $this->image;
     }
@@ -173,9 +167,9 @@ class Card
      *
      * @param Image $image Image instance.
      *
-     * @return Card
+     * @return $this
      */
-    public function setImage($image)
+    public function setImage(Image $image): self
     {
         $this->image = $image;
 
@@ -184,10 +178,8 @@ class Card
 
     /**
      * Returns the card data array.
-     *
-     * @return array
      */
-    public function render()
+    public function render(): array
     {
         $response = [];
 
