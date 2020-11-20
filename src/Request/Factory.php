@@ -17,7 +17,8 @@ class Factory
      * @param string $rawData       JSON encoded data.
      * @param string $applicationId Application ID.
      *
-     * @throws Exception
+     * @throws InvalidArgumentException in case of invalid requests.
+     * @throws Exception                in case of internal errors.
      *
      * @return Request Appropriate Request class for the request type.
      */
@@ -41,6 +42,7 @@ class Factory
         ;
 
         // validate certificate
+        $this->validateCertificateVars();
         $this->buildCertificate()
             ->validateRequest($rawData)
         ;
@@ -164,5 +166,19 @@ class Factory
         }
 
         return $className;
+    }
+
+    /**
+     * @throws InvalidArgumentException if a required $_SERVER variable is missing.
+     */
+    private function validateCertificateVars(): void
+    {
+        if (!array_key_exists('HTTP_SIGNATURECERTCHAINURL', $_SERVER)) {
+            throw new InvalidArgumentException('Missing expected HTTP_SIGNATURECERTCHAINURL');
+        }
+
+        if (!array_key_exists('HTTP_SIGNATURE', $_SERVER)) {
+            throw new InvalidArgumentException('Missing expected HTTP_SIGNATURE');
+        }
     }
 }

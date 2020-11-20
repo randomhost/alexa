@@ -5,6 +5,7 @@ namespace randomhost\Alexa\Request;
 use DateTime;
 use Exception;
 use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * Validates the request signature.
@@ -93,21 +94,13 @@ class Certificate
     {
         $requestParsed = json_decode($requestData, true);
 
-        try {
-            $this
-                ->validateDataFormat($requestParsed)
-                ->validateTimestamp($requestParsed['request']['timestamp'])
-                ->verifySignatureCertificateURL()
-                ->validateCertificate()
-                ->validateRequestSignature($requestData)
-            ;
-        } catch (InvalidArgumentException $e) {
-            http_response_code(400);
-
-            throw $e;
-        }
-
-        http_response_code(200);
+        $this
+            ->validateDataFormat($requestParsed)
+            ->validateTimestamp($requestParsed['request']['timestamp'])
+            ->verifySignatureCertificateURL()
+            ->validateCertificate()
+            ->validateRequestSignature($requestData)
+        ;
     }
 
     /**
@@ -348,7 +341,7 @@ class Certificate
     protected function fetchCertificate()
     {
         if (!function_exists('curl_init')) {
-            throw new InvalidArgumentException(
+            throw new RuntimeException(
                 'CURL is required to download the signature certificate.'
             );
         }
